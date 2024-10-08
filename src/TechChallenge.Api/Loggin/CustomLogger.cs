@@ -1,9 +1,12 @@
+using System.Text;
+
 namespace TechChallenge.Api.Loggin;
 
 public class CustomLogger : ILogger
 {
     private readonly string _loggerName;
     private readonly CustomLoggerProviderConfiguration _loggerConfig;
+    public static bool ToFile { get; set; } = false;
     public CustomLogger(string loggerName, CustomLoggerProviderConfiguration loggerConfig)
     {
         _loggerName = loggerName;
@@ -22,6 +25,27 @@ public class CustomLogger : ILogger
     public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
     {
        var message = $"Execution Log for {logLevel}: {eventId} {formatter(state, exception)}";
-       Console.WriteLine(message);
+       if (ToFile)
+       {
+           WriteLogInFile(message);
+       }
+       else
+       {
+           Console.WriteLine(message);
+       }
+       
+    }
+
+    private void WriteLogInFile(string message)
+    {
+        var filePath = Environment.CurrentDirectory + @$"/LOG-{DateTime.Now:yyyy-MM-dd}.txt";
+        if (!File.Exists(filePath))
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(filePath));
+            File.Create(filePath).Dispose();
+        }
+        using StreamWriter sw = new(filePath, true);
+        sw.WriteLine(message);
+        sw.Close();
     }
 }
