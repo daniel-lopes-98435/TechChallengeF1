@@ -24,7 +24,7 @@ public class CheckValidContacts
     {
         var contact = new Contact(firstName, lastName, email);
 
-        var isValidEmail = contact.FirstName == null;
+        var isValidEmail = contact.LastName == null;
         Assert.Equal(isValidEmail, isValid);
     }
     

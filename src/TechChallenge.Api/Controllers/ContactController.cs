@@ -26,15 +26,15 @@ public class ContactController : ControllerBase
 
     [HttpGet]
     [Route("/contact-list")]
-    public  async Task<ActionResult<IEnumerable<Contact>>> GetAllContacts()
+    public  async Task<ActionResult<ContactResponse<IEnumerable<Contact>>>> GetAllContacts()
     {
-        CustomLogger.ToFile = true;
-        _logger.LogInformation("Information test log");
-
+        
         var response = await _contactRepository.GetAllContactsAsync();
         
         if (!response.Success)
         {
+            CustomLogger.ToFile = true;
+            _logger.LogError(JsonSerializer.Serialize(response));
             return NotFound(response); 
         }
         else
@@ -45,11 +45,13 @@ public class ContactController : ControllerBase
     }
     
     [HttpGet("{id}")]
-    public async Task<ActionResult<Contact>> GetContactById(int id)
+    public async Task<ActionResult<ContactResponse<Contact>>> GetContactById(int id)
     {
        var response = await _contactRepository.GetContactByIdAsync(id);
         if (!response.Success)
         {
+            CustomLogger.ToFile = true;
+            _logger.LogError(JsonSerializer.Serialize(response));
             return NotFound(response);
         }
         return Ok(response);
@@ -57,11 +59,13 @@ public class ContactController : ControllerBase
     
     [HttpPost]
     [Route("/contact-add")]
-    public async Task<ActionResult<Contact>> AddContact(Contact contact)
+    public async Task<ActionResult<ContactResponse<Contact>>> AddContact(Contact contact)
     {
         var response = await _contactRepository.AddContactAsync(contact);
         if (!response.Success)
         {
+            CustomLogger.ToFile = true;
+            _logger.LogError(JsonSerializer.Serialize(response));
             return BadRequest(JsonSerializer.Serialize(response));
         }
         
@@ -70,19 +74,27 @@ public class ContactController : ControllerBase
 
     [HttpPut]
     [Route("/contact-update")]
-    public async Task<ActionResult<Contact>> UpdateContact(int id, Contact contact)
+    public async Task<ActionResult<ContactResponse<Contact>>> UpdateContact(int id, Contact contact)
     {
         if (id != contact.Id)
         {
-            return BadRequest(new ContactResponse<Contact>
+
+
+            var errorResponse = new ContactResponse<Contact>
             {
                 Success = false,
                 Message = $"There is no Contact  Id {id} informed is diferent from the Id {contact.Id} in the payload."
-            });
+            };
+            CustomLogger.ToFile = true;
+            _logger.LogError(JsonSerializer.Serialize(errorResponse));     
+            
+            return BadRequest(errorResponse);
         }
         var response = await _contactRepository.UpdateContact(contact);
         if (!response.Success)
         {
+            CustomLogger.ToFile = true;
+            _logger.LogError(JsonSerializer.Serialize(response));
             return NotFound(response); 
         }
         else
@@ -94,11 +106,13 @@ public class ContactController : ControllerBase
 
     [HttpDelete]
     [Route("/contact-delete")]
-    public async Task<ActionResult<Contact>> DeleteContact(int id)
+    public async Task<ActionResult<ContactResponse<Contact>>> DeleteContact(int id)
     {
          var response = await _contactRepository.RemoveContact(id);
          if (!response.Success)
-         {
+         {            
+             CustomLogger.ToFile = true;
+             _logger.LogError(JsonSerializer.Serialize(response));
              return NotFound(response); 
          }
          else

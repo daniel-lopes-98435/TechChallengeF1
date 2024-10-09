@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text;
 
 namespace TechChallenge.Api.Loggin;
@@ -45,7 +46,7 @@ public class CustomLogger : ILogger
             File.Create(filePath).Dispose();
         }
         using StreamWriter sw = new(filePath, true);
-        sw.WriteLine(message);
+        sw.WriteLine($"[{DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss", CultureInfo.InvariantCulture)}] - {message}");
         sw.Close();
     }
 }
