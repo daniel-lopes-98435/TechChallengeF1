@@ -6,12 +6,10 @@ using TechChallenge.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var configuration = new ConfigurationBuilder()
-    .AddJsonFile("appsettings.json")
-    .Build();
+//Add services to Database
 
-var connectionString = configuration.GetValue<string>("ConnectionStringSql");
-builder.Services.AddScoped<IDbConnection>((connection) => new SqlConnection(connectionString));
+builder.Services.AddScoped<IContactRepository, ContactRepository>();
+
 
 // Add services to the container.
 
@@ -29,7 +27,7 @@ builder.Logging.AddProvider(new CustomLoggerProvider(new CustomLoggerProviderCon
 }));
 
 
-builder.Services.AddScoped<IContactRepository, ContactRepositoryRepository>();
+builder.Services.AddScoped<IContactRepository, ContactRepository>();
 
 var app = builder.Build();
 
