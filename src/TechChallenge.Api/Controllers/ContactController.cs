@@ -83,7 +83,7 @@ public class ContactController : ControllerBase
             var errorResponse = new ContactResponse<Contact>
             {
                 Success = false,
-                Message = $"There is no Contact  Id {id} informed is diferent from the Id {contact.Id} in the payload."
+                Message = $"The Contact Id {id} informed is different from the Id {contact.Id} in the payload."
             };
             CustomLogger.ToFile = true;
             _logger.LogError(JsonSerializer.Serialize(errorResponse));     
